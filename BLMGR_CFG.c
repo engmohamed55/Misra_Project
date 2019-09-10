@@ -6,7 +6,7 @@
  */ 
 #include "DIO.h"
 #include "BLMGR_CFG.h"
-BLMGR_DioPinConfig BuzzerConfig      = {PC,1<<4};
-BLMGR_DioPinConfig BlueToothPwrConfig = {PC,1<<5};
-BLMGR_DioPinConfig BluetoothKeyConfig = {PD,1<<2};	
+BLMGR_DioPinConfig BuzzerConfig      = {PC,PIN4};
+BLMGR_DioPinConfig BlueToothPwrConfig = {PC,PIN5};
+BLMGR_DioPinConfig BluetoothKeyConfig = {PD,PIN2};
 	

@@ -10,10 +10,19 @@
 #define BLMGR_CFG_H_
 
 #include "Basic_Types.h"
+#define PIN0 0u
+#define PIN1 1u
+#define PIN2 2u
+#define PIN3 3u
+#define PIN4 4u
+#define PIN5 5u
+#define PIN6 6u
+#define PIN7 7u
+
 typedef struct  
 {
 	u8 Portname;
-	u8 PortMask;
+	u8 PortMask1;
 }BLMGR_DioPinConfig;
 
 #define BLOUETOOTH_ON 0xff
@@ -25,3 +34,4 @@ typedef struct
  
 
 #endif /* BLMGR_CFG_H_ */
+
