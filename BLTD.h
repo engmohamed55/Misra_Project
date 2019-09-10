@@ -9,19 +9,27 @@
 #ifndef BLTD_H_
 #define BLTD_H_
 #include "Basic_Types.h"
-#define BLTD_RESP_STATUS_OK 0x00
-#define BLTD_RESP_STATUS_NOK 0x01
-#define BLTD_RESP_STATUS_NON 0x02
+#define BLTD_RESP_STATUS_OK 0x00U
+#define BLTD_RESP_STATUS_NOK 0x01U
+#define BLTD_RESP_STATUS_NON 0x02U
 typedef void (*CbkPfnType)(void);
+
+
+static u8 IsRespRecieved;
+static u8 RxBuffer[100U];
+static void BTCommandSend(const u8 Command[],u16 CommandLength);
+static void RxcCallBackFun(void);
+static  void MemCpy2(u8 Des[],const u8 Src[],u16 Length);
+
 extern void BLTD_SendInitCmd(void);
-extern u8 BLTD_CheckForResponse(u8* Response,u16 RespLength);
+u8 BLTD_CheckForResponse(const u8 Response[],u16 RespLength);
 extern void BLTD_SendInquireCmd(void);
-extern void BLTD_SendMessage(u8* Message,u16 MsgLength);
+void BLTD_SendMessage(const u8 Message[],u16 MsgLength);
 extern void BLTD_StartWaitPairing(void);
 extern void BLTD_StartReceivingData(u8* DataBuffer,u16 BufferLength,CbkPfnType CbkFnPtr);
-extern u8 BLTD_CheckForData(u8 *data);
+extern u8 BLTD_CheckForData(u8* Data);
 extern void BLTD_SenTestCmd(void);
-extern u8 BLTD_GetRecievedData(u8*Data, u16 Length);
+extern u8 BLTD_GetRecievedData(u8 Data[], u16 Length);
 
 
 
