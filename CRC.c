@@ -1,93 +1,107 @@
 ﻿#include "Basic_Types.h"
+#include "CRC.h"
+
 /***************************************************************************************/
 static u32 GetPower(u32 Base,u32 Pow);
-static u16 gen_crc16(const u8 *data, u16 size, u32 CRC16);
+static u16 gen_crc16(const u8 data[], u16 size, u32 CRC16);
+u32 randi(void);
 /***************************************************************************************/
 void SECR_CrcPolynomialGenerate(u32* PolynomialPtr,u8 CrcLengthInBits)
 {
 	u32 DevisorValue;
-	DevisorValue = (u32)(GetPower(2,CrcLengthInBits)) - 1;
-	*PolynomialPtr = (rand() % DevisorValue) +0x10000 ;
+	DevisorValue = (GetPower((u32)2,(u32)CrcLengthInBits)) - (u32)1;
+	*PolynomialPtr = ((u32)randi() % (u32)DevisorValue) +(u32)0x10000 ;
 }
 /***************************************************************************************/
-void SECR_GnerateCrc(const u8* PayloadPtr,u16 PayloadLength, u16* CrcPtr, u32 CrcPoly)
+void SECR_GnerateCrc(const u8 PayloadPtr[],u16 PayloadLength, u16* CrcPtr, u32 CrcPoly)
 {
-	u16 LoopIndex;
+	u16 LoopIndex,p;
 	static u8 InternalBuffer[8];
 	/*Copying data to internal buffer*/
-	for (LoopIndex = 0; LoopIndex < PayloadLength; LoopIndex ++)
+	for (LoopIndex = (u8)0; LoopIndex < PayloadLength; LoopIndex ++)
 	{
-		InternalBuffer[LoopIndex] = *(PayloadPtr + LoopIndex);
+	    p = LoopIndex;
+		InternalBuffer[LoopIndex] = PayloadPtr[LoopIndex];
 	}
 	/*perform bit wise invert on the data*/
-	for (LoopIndex = 0; LoopIndex < PayloadLength; LoopIndex ++)
+	for (LoopIndex = (u8)0; LoopIndex < PayloadLength; LoopIndex ++)
 	{
-		InternalBuffer[LoopIndex]  ^= 0xff;
+		InternalBuffer[LoopIndex]  ^= (u8)0xff;
 	}
 	/*Generate CRC*/
-	*CrcPtr = gen_crc16(InternalBuffer,PayloadLength*8,0x18005);
+	*CrcPtr = gen_crc16(InternalBuffer,(u16)PayloadLength*(u16)8,(u32)0x18005);
 }
 /***************************************************************************************/
 static u32 GetPower(u32 Base,u32 Pow)
 {
-	u32 result = 1;
-	u32 LoopIndex;
-	for (LoopIndex = 0; LoopIndex < Pow; LoopIndex ++)
+	u32 result = (u8)1;
+	u32 LoopIndex2;
+	for (LoopIndex2 = (u8)0; LoopIndex2 < Pow; LoopIndex2 ++)
 	{
 		result *= Base;
 	}
 	return result;
 }
 /***************************************************************************************/
-static u16 gen_crc16(const u8 *data, u16 size, u32 CRC16)
+static u16 gen_crc16(const u8 data[], u16 size, u32 CRC16)
 {
+    u16 m,test;
 	u16 out = 0;
 	u16 bits_read = 0, bit_flag;
 	u16 i;
-	u16 crc = 0;
-	u16 j = 0x0001;
+	u16 crc = (u16)0;
+	u16 j = (u16)0x0001;
 	/* Sanity check: */
-	if(data == 0)
-	return 0;
-
-	while(size > 0)
+	if(data == (u8)0)
 	{
-		bit_flag = out >> 15;
+	    m = (u16)0;
+	}
+	while(size > (u16)0)
+	{
+		bit_flag = out >> (u16)15;
 
 		/* Get next bit: */
-		out <<= 1;
-		out |= (*data >> bits_read) & 1; // item a) work from the least significant bits
-
+		out <<= (u16)1;
+		test = (*data >> bits_read) & (u16)1; /*item a) work from the least significant bits*/
+		out |= test;
 		/* Increment bit counter: */
 		bits_read++;
-		if(bits_read > 7)
+		if(bits_read > (u16)7)
 		{
-			bits_read = 0;
-			data++;
+			bits_read = (u16)0;
 			size--;
 		}
 
 		/* Cycle check: */
 		if(bit_flag)
+		{
 		out ^= CRC16;
+		}
 
 	}
 
-	// item b) "push out" the last 16 bits
+	/*item b) "push out" the last 16 bits*/
 
-	for (i = 0; i < 16; ++i) {
-		bit_flag = out >> 15;
-		out <<= 1;
+	for (i = (u16)0; i < (u16)16; ++i) {
+		bit_flag = out >> (u16)15;
+		out <<= (u16)1;
 		if(bit_flag)
+		{
 		out ^= CRC16;
-	}
+		}
+		}
 
-	// item c) reverse the bits
+	/*item c) reverse the bits*/
 
-	i = 0x8000;
+	i = (u16)0x8000;
 
-	for (; i != 0; i >>=1, j <<= 1) {
-		if (i & out) crc |= j;
+	for (; i != (u16)0; i >>=1 ) {
+
+		if (i && out)
+		    {
+		    crc |= j;
+		    }
+		 j <<= 1;
 	}
 
 	return crc;
